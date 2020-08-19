@@ -6,10 +6,6 @@ from vimms.DIA import DiaWindows
 from vimms.MassSpec import ScanParameters
 
 
-########################################################################################################################
-# DIA Controllers
-########################################################################################################################
-
 class TreeController(Controller):
     def __init__(self, dia_design, window_type, kaufmann_design, extra_bins, num_windows=None):
         super().__init__()
@@ -25,10 +21,17 @@ class TreeController(Controller):
     def handle_acquisition_closing(self):
         logger.info('Acquisition closing')
 
+    def reset(self):
+        pass
+
+    def update_state_after_scan(self, last_scan):
+        pass
+        # TODO: add precursor information here
+
     def _process_scan(self, scan):
         # if there's a previous ms1 scan to process
         new_tasks = []
-        if self.last_ms1_scan is not None:
+        if self.scan_to_process is not None:
 
             rt = self.last_ms1_scan.rt
 
@@ -47,4 +50,6 @@ class TreeController(Controller):
 
             # set this ms1 scan as has been processed
             self.last_ms1_scan = None
+            num_scans = (len(self.scans[1]) + len(self.scans[2]) + len(locations))
+            self.next_processed_scan_id = num_scans
         return new_tasks
